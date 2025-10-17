@@ -1,103 +1,131 @@
+'use client'
+
+import { useEffect, useState } from "react";
+import { FaPlay } from "react-icons/fa";
+import { FaPause } from "react-icons/fa6";
+import { FaVolumeMute, FaVolumeUp } from "react-icons/fa"
 import Image from "next/image";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const [audio, setAudio] = useState<HTMLAudioElement>();
+  const [playing, isPlaying] = useState(false);
+  const [gain, setGain] = useState<GainNode>();
+  const [volume, setVolume] = useState<number>(1);
+  const [muted, setMuted] = useState(false);
+  const [previousVolume, setPreviousVolume] = useState<number>(1);
+
+  useEffect(() => {
+    configAudio("./audio/Multimidia_em_acao.mp3");
+  }, []);
+
+  const toggleMute = () => {
+    if (gain) {
+      if (muted) {
+        gain.gain.value = previousVolume;
+        setVolume(previousVolume);
+      } else {
+        setPreviousVolume(volume);
+        gain.gain.value = 0;
+        setVolume(0);
+      }
+      setMuted(!muted);
+    }
+  };
+
+  const configVolume = (newValue: number) => {
+    if (gain) {
+      gain.gain.value = newValue;
+    }
+    setVolume(newValue);
+  }
+
+  const configAudio = (url: string) => {
+    const newAudio = new Audio(url);
+    setAudio(newAudio);
+
+    const audioContext = new AudioContext();
+    const media = audioContext.createMediaElementSource(newAudio);
+    const newGanho = audioContext.createGain();
+    media.connect(newGanho);
+    newGanho.connect(audioContext.destination);
+    setGain(newGanho);
+  }
+  const playPause = () => {
+    if (playing) {
+      pause();
+    }
+    else {
+      play();
+    }
+    isPlaying(!playing);
+  }
+
+  const play = () => {
+    if (audio) {
+      audio.play();
+    }
+  }
+
+  const pause = () => {
+    if (audio) {
+      audio.pause();
+    }
+  }
+
+  return (
+
+    <div className="w-[400px] h-[600px] bg-[#161511] flex flex-col justify-center items-center rounded-[10px]">
+      <main className="w-[350px] h-[550px] bg-[#212830] rounded-[16px] flex flex-col justify-center items-center p-4">
+        <div className="w-full h-[70%] flex flex-col items-center justify-between p-2 gap-4 mb-0">
+          <Image
+            className="rounded-[16px] mx-auto"
+            src="/imgs/Multimidia_em_acao.png"
+            alt="Capa do album Multimídia em Ação"
+            width={280} 
+            height={280}
+            objectFit="cover"
+            priority
+          />
+
+          <div className="flex flex-col items-center p-1">
+            <h1 className="text-[#dacfcf] text-xl text-center font-medium m-0">Multimidia em Ação</h1>
+            <h2 className="text-[#b3b3b3] text-center text-sm font-normal opacity-[0.8]">IA</h2>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-4">
+
+          {/* botão de play e pause */}
+          <button onClick={e => playPause()}>
+            {
+              playing ?
+                <FaPause className="text-black" />
+                :
+                <FaPlay className="text-black" />
+            }
+          </button>
+          {/* botao de volume e mute */}
+          <button onClick={toggleMute}>
+            {muted ? <FaVolumeMute className="text-black" /> : <FaVolumeUp className="text-black" />}
+          </button>
+          <div>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              value={volume}
+              step={0.001}
+              onChange={e => configVolume(Number(e.target.value))}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      {/* Rodapé */}
+      <footer className="flex gap-[24px] flex-wrap items-center justify-center py-2">
+        <p className="text-center text-base text-[#f7e3e4]">© 2025 mateusvct1</p>
       </footer>
     </div>
   );
 }
+
