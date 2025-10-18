@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useState } from "react";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa6";
@@ -15,10 +14,6 @@ export default function Home() {
   const [muted, setMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState<number>(1);
 
-  useEffect(() => {
-    configAudio("./audio/Multimidia_em_acao.mp3");
-  }, []);
-
   const toggleMute = () => {
     if (gain) {
       if (muted) {
@@ -32,6 +27,11 @@ export default function Home() {
       setMuted(!muted);
     }
   };
+
+  useEffect(() => {
+    configAudio("/audio/Multimidia_em_acao.mp3");
+  }, []);
+
 
   const configVolume = (newValue: number) => {
     if (gain) {
@@ -55,6 +55,7 @@ export default function Home() {
     if (playing) {
       pause();
     }
+    
     else {
       play();
     }
