@@ -165,7 +165,7 @@ export default function Home() {
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-center text-black gap-10">
             
-            {/* botao de avancar 10s */}
+            {/* botao de retoceder 10s */}
             <button className="cursor-pointer hover:text-white opacity-[80%]" onClick={e => decrementaMusica()}>
               <FaBackward />
             </button>
@@ -189,7 +189,7 @@ export default function Home() {
             <button className="cursor-pointer hover:text-white opacity-[80%]" onClick={() => nextMusica()}>
               <GiNextButton />
             </button>
-              {/* botao de retroceder 10s */} 
+              {/* botao de avançar 10s */} 
              <button className="cursor-pointer hover:text-white opacity-[80%]" onClick={e => incrementaMusica()}>
               <FaForward />
             </button>
